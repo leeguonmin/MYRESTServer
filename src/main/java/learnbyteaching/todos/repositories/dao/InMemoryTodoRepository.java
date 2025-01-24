@@ -45,7 +45,7 @@ public class InMemoryTodoRepository implements TodoRepository {
     // POST, PUT 메서드 처리용 
     @Override
     public TodoItem save(TodoItem todoItem) {
-        if (todoItem.getId() == null) {
+        if (todoItem.getId() == null) {			// 아이디가 널이면 = 새로 들어온 아이템이란 뜻이겟쥬? 
             todoItem.setId(counter.incrementAndGet());
             todos.add(todoItem);
         } else {

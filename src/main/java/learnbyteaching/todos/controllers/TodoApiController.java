@@ -1,14 +1,19 @@
 package learnbyteaching.todos.controllers;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.catalina.startup.ClassLoaderFactory.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import learnbyteaching.todos.repositories.dao.TodoRepository;
@@ -43,6 +48,32 @@ public class TodoApiController {
 		// 이렇게 별로 안쓰는데 실제 쓰이는 코드기도하니까, 보여주려고 이렇게 썼다구 합니다
 	}
 	
+	
+	// keyword 파라미터 전달 받아서 title을 대상으로 검색 -> 목록 가져오기
+	@GetMapping("/search")
+	public ResponseEntity<List<TodoItem>> searchTodos(@RequestParam("keyword") String keyword) {
+		List<TodoItem> foundTodos = todoRepository.findAll().stream().filter(todo -> todo.getTitle()
+																						.toLowerCase()
+																						.contains(keyword.toLowerCase()))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(foundTodos);
+	}
+	
+	
+	// 새로운 TodoItem 항목 생성
+	@PostMapping
+	public ResponseEntity<TodoItem> createTodo(
+			@RequestBody TodoItem todotem
+			) {
+		TodoItem savedTodo = todoRepository.save(todotem);
+//		return ResponseEntity.created("Location:/api/todos/" + savedTodo.getId());
+		
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.header("Location", "/api/todos/" + savedTodo.getId())
+				.body(savedTodo);
+		//	TODO: 나중에 수정
+		
+	}
 	
 	
 
